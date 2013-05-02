@@ -118,8 +118,11 @@ function Medals($flair) {
     this.$flair = $flair;
     this.values = $flair.text().split(/ +/).map(parseFloat);
     var subreddit = Reddit.subreddit();
-    var user = $flair.parent().find('.author:first').text();
-    this.flair = new Flair(subreddit, user);
+    var author = $flair.parent().find('.author:first');
+    this.id = author.attr('class').split(/ +/).filter(function(c) {
+        return /id-t2_([a-z0-9]+)/.exec(c);
+    })[0];
+    this.flair = new Flair(subreddit, author.text());
 }
 
 /**
@@ -132,7 +135,7 @@ Medals.prototype.modify = function(type, amount) {
     amount = amount != null ? amount : 1;
     this.values[type] += amount;
     this.flair.text(this.values.join(' '), function(text) {
-        this.$flair.text(text);
+        $('.' + this.id).parent().find('.flair:first').text(text);
     }.bind(this));
     return this.values[type];
 };
