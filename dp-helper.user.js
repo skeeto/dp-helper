@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         The DailyProgrammer Medal Helper
 // @description  Edit user's medals more easily.
-// @version      1.0
+// @version      1.0.1
 // @license      Public Domain
 // @include      http*://*.reddit.com/r/dailyprogrammer*
 // @include      http*://*.reddit.com/r/skeeto*
