@@ -87,6 +87,7 @@ Flair.prototype.text = function(text, callback) {
         /* Set */
         $.post(Reddit.api('selectflair'), {
             name: this.user,
+            /* Not sure what to put here. Doesn't seem to matter? */
             flair_template_id: '6893c150-b364-11e2-9d30-12313b0b21ae',
             text: text,
             uh: Reddit.modhash
