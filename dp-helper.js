@@ -1,14 +1,30 @@
+/**
+ * @namespace
+ */
 var Reddit = Reddit || {};
 
+/**
+ * The current user's modhash.
+ * @type String
+ */
 Reddit.modhash = null;
 $.getJSON('/api/me.json', function(me) {
     Reddit.modhash = me.data.modhash;
 });
 
-Reddit.api = function(subreddit, api) {
+/**
+ * @param {String} api
+ * @param {String} [subreddit]
+ * @returns {String} an API URL for the requested API.
+ */
+Reddit.api = function(api, subreddit) {
+    subreddit = subreddit || Reddit.subreddit();
     return '/r/' + subreddit + '/api/' + api + '.json';
 };
 
+/**
+ * @returns {String} the current subreddit name, null for no subreddit.
+ */
 Reddit.subreddit = function() {
     var match = location.pathname.match(/\/r\/([^/]+)/);
     if (match) {
@@ -18,16 +34,25 @@ Reddit.subreddit = function() {
     }
 };
 
-
-function Flair(subreddit, user) {
-    this.subreddit = subreddit;
+/**
+ * Represent's a user's flair on the current subreddit.
+ * @param {String} user
+ * @constructor
+ * @namespace
+ */
+function Flair(user) {
     this.user = user;
 }
 
+/**
+ * Get/set the text for this flair.
+ * @param {String} [text] Sets the user's flair text.
+ * @param {Function} [callback] Getting/setting is asynchronous.
+ */
 Flair.prototype.text = function(text, callback) {
     if (Object.prototype.toString.call(text) === "[object String]") {
         /* Set */
-        $.post(Reddit.api(this.subreddit, 'selectflair'), {
+        $.post(Reddit.api('selectflair'), {
             name: this.user,
             flair_template_id: '6893c150-b364-11e2-9d30-12313b0b21ae',
             text: text,
@@ -40,7 +65,7 @@ Flair.prototype.text = function(text, callback) {
     } else {
         /* Get */
         callback = text;
-        $.getJSON(Reddit.api(this.subreddit, 'flairlist'), {
+        $.getJSON(Reddit.api('flairlist'), {
             name: 'skeeto'
         }, function(data) {
             if (callback) {
@@ -50,7 +75,12 @@ Flair.prototype.text = function(text, callback) {
     }
 };
 
-
+/**
+ * Represent's a users medals on r/dailyprogrammer.
+ * @param {jQuery} $flair jQuery DOM node for the flair.
+ * @constructor
+ * @namespace
+ */
 function Medals($flair) {
     this.$flair = $flair;
     this.values = $flair.text().split(/ +/).map(parseFloat);
@@ -59,6 +89,12 @@ function Medals($flair) {
     this.flair = new Flair(subreddit, user);
 }
 
+/**
+ * Modify a user's medals asynchronously, locally and on the server.
+ * @param {number} type 0 for gold, 1 for silver.
+ * @param {number} [amount] Default 1.
+ * @returns {number} The new medal total for that type.
+ */
 Medals.prototype.modify = function(type, amount) {
     amount = amount != null ? amount : 1;
     this.values[type] += amount;
@@ -69,7 +105,7 @@ Medals.prototype.modify = function(type, amount) {
 };
 
 
-
+/* Attach a click event handler to modify medals. */
 $('.flair').css('cursor', 'pointer').each(function() {
     var $flair = $(this);
     var medals = new Medals($flair);
