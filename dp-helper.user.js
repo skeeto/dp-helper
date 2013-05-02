@@ -9,6 +9,7 @@
 // ==/UserScript==
 
 /**
+ * Basic reddit information and functions.
  * @namespace
  */
 var Reddit = Reddit || {};
@@ -18,9 +19,31 @@ var Reddit = Reddit || {};
  * @type String
  */
 Reddit.modhash = null;
-$.getJSON('/api/me.json', function(me) {
-    Reddit.modhash = me.data.modhash;
-});
+
+/**
+ * The current reddit user.
+ * @type String
+ */
+Reddit.user = null;
+
+/**
+ * The current reddit user's thing ID.
+ * @type String
+ */
+Reddit.id = null;
+
+/**
+ * Initialize everything that needs to be initialized.
+ * @param {Function} [callback]
+ */
+Reddit.init = function(callback) {
+    $.getJSON('/api/me.json', function(me) {
+        Reddit.modhash = me.data.modhash;
+        Reddit.user = me.data.name;
+        Reddit.id = me.data.id;
+        if (callback) callback(me.data);
+    });
+};
 
 /**
  * @param {String} api
@@ -116,16 +139,18 @@ Medals.prototype.modify = function(type, amount) {
 
 
 /* Attach a click event handler to modify medals. */
-$('.flair').css('cursor', 'pointer').each(function() {
-    var $flair = $(this);
-    var medals = new Medals($flair);
-    $flair.click(function(event) {
-        var type = Math.round(event.offsetX / $(this).width());
-        medals.modify(type, 1);
-    });
-    $flair.bind('contextmenu', function(event) {
-        var type = Math.round(event.offsetX / $(this).width());
-        medals.modify(type, -1);
-        return false;
+Reddit.init(function() {
+    $('.flair').css('cursor', 'pointer').each(function() {
+        var $flair = $(this);
+        var medals = new Medals($flair);
+        $flair.click(function(event) {
+            var type = Math.round(event.offsetX / $(this).width());
+            medals.modify(type, 1);
+        });
+        $flair.bind('contextmenu', function(event) {
+            var type = Math.round(event.offsetX / $(this).width());
+            medals.modify(type, -1);
+            return false;
+        });
     });
 });
