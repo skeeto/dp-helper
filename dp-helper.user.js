@@ -147,10 +147,14 @@ Reddit.init(function() {
         var $flair = $(this);
         var medals = new Medals($flair);
         $flair.click(function(event) {
+            event.offsetX = event.offsetX ||
+                (event.clientX - $(this).offset().left);
             var type = Math.round(event.offsetX / $(this).width());
             medals.modify(type, 1);
         });
         $flair.bind('contextmenu', function(event) {
+            event.offsetX = event.offsetX ||
+                (event.clientX - $(this).offset().left);
             var type = Math.round(event.offsetX / $(this).width());
             medals.modify(type, -1);
             return false;
