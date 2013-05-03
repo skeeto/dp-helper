@@ -121,7 +121,7 @@ function Medals($flair) {
     this.id = author.attr('class').split(/ +/).filter(function(c) {
         return /id-t2_([a-z0-9]+)/.exec(c);
     })[0];
-    this.flair = new Flair(subreddit, author.text());
+    this.flair = new Flair(author.text());
 }
 
 /**
