@@ -98,7 +98,7 @@ Flair.prototype.text = function(text, callback) {
         /* Get */
         callback = text;
         $.getJSON(Reddit.api('flairlist'), {
-            name: 'skeeto'
+            name: this.user
         }, function(data) {
             if (callback) {
                 callback(data.users[0].flair_text);
